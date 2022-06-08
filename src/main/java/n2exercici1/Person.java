@@ -11,7 +11,7 @@ public class Person {
     private String lastName;
     @JsonElement(key = "Edad")
     private String age;
-    @JsonElement(key = "Dirección")
+   // @JsonElement(key = "Dirección")
     private String address;
 
     public Person(String firstName, String lastName) {

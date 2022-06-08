@@ -3,12 +3,15 @@ package n2exercici1;
 import java.io.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.simple.JSONObject;
 
 public class N2exercici1 {
 
     public static final String ON_VAS = "./src/main/resources/";
+    private static FileWriter file;
 
-    public static void main(String[] args)  {
+
+    public static void main(String[] args) {
 
         Person person = new Person("jesús", "divino", "33");
 
@@ -18,17 +21,27 @@ public class N2exercici1 {
 
         try (OutputStream is = new FileOutputStream(path)){
 
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.writeValue( is, json);
-            System.out.println("Proceso completado!");
+            // Constructs a FileWriter given a file name, using the platform's default charset
+            file = new FileWriter(path);
+            file.write(json);
+            System.out.println("Successfully Created JSON Object to File...");
+            System.out.println("\nJSON Object: " + json);
 
         } catch (IOException e) {
 
-            System.out.println("Mira, no sale... no sé que pasa");
-            System.out.println(e.getMessage());
+            e.printStackTrace();
+
+        } finally {
+
+            try {
+                file.flush();
+                file.close();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
 
     }
-
 
 }

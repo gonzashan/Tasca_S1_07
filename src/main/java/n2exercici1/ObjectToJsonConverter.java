@@ -1,5 +1,7 @@
 package n2exercici1;
 
+import org.json.simple.JSONObject;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -15,7 +17,8 @@ public class ObjectToJsonConverter {
 
             checkIfSerializable(object);
             initializeObject(object);
-            return getJsonString(object);
+            //getJsonString1(object);
+            return getJsonString1(object);
 
         } catch (Exception e) {
 
@@ -62,7 +65,6 @@ public class ObjectToJsonConverter {
             }
         }
     }
-
     private String getPathFile(Object object) throws IllegalArgumentException, IllegalAccessException {
 
         Class<?> clazz = object.getClass();
@@ -74,11 +76,28 @@ public class ObjectToJsonConverter {
                     "JsonPathFile o JsonFile");
         } else {
 
-           // return clazz.getAnnotation(JsonSerializable.class).path();
+            // return clazz.getAnnotation(JsonSerializable.class).path();
             return clazz.getAnnotation(JsonPathFile.class).path()
                     + clazz.getAnnotation(JsonFile.class).fileName();
         }
 
+    }
+
+
+    private String getJsonString1(Object object) throws IllegalArgumentException, IllegalAccessException {
+        Class<?> clazz = object.getClass();
+
+        JSONObject obj = new JSONObject();
+
+        for (Field field : clazz.getDeclaredFields()) {
+            field.setAccessible(true);
+            // As before this the class. Ask if they have present the annotation to be included in Json file
+            if (field.isAnnotationPresent(JsonElement.class)) {
+                // Put into the map
+                obj.put(getKey(field), field.get(object));
+            }
+        }
+        return obj.toJSONString();
     }
 
     private String getJsonString(Object object) throws IllegalArgumentException, IllegalAccessException {
@@ -99,11 +118,12 @@ public class ObjectToJsonConverter {
 
         //Streaming the map and build the Json structure with each list element
         //And finally return them to write Json file.
-        String jsonString = jsonElementsMap.entrySet()
+
+        return jsonElementsMap.entrySet()
                 .stream()
-                .map(entry -> "\"" + entry.getKey() + "\":\"" + entry.getValue() + "\"")
+                .map(entry -> "'" + entry.getKey() + "'" + ":" + "'" + entry.getValue() + "'")
                 .collect(Collectors.joining(","));
-        return "{" + jsonString + "}";
+
     }
 
     private String getKey(Field field) {
